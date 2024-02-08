@@ -4,7 +4,7 @@ project(lowris C)
 set(CMAKE_C_STANDARD 11)
 
 
-add_executable(lowris src/main.c src/board.c)
+add_executable(lowris src/main.c src/board.c src/tetromino.c)
 
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)

@@ -12,6 +12,8 @@
 #define BOARD_HEIGHT 20
 #define TILE_SIZE 32
 
+#define BOARD(x, y) ((x) + (y) * BOARD_WIDTH)
+
 typedef struct {
     char *data;
 } lowris_board;

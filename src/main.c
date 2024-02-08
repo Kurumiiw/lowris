@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 #include "board.h"
+#include "tetromino.h"
 
 typedef struct {
     SDL_Window *window;
@@ -29,13 +30,21 @@ int main()
 
     lowris_board *board = LowrisCreateBoard();
 
-    board->data[1 + 2 * BOARD_WIDTH] = 1;
-    board->data[2 + 2 * BOARD_WIDTH] = 2;
-    board->data[3 + 2 * BOARD_WIDTH] = 3;
-    board->data[4 + 2 * BOARD_WIDTH] = 4;
-    board->data[5 + 2 * BOARD_WIDTH] = 5;
-    board->data[6 + 2 * BOARD_WIDTH] = 6;
-    board->data[7 + 2 * BOARD_WIDTH] = 7;
+    board->data[BOARD(1, 2)] = 1;
+    board->data[BOARD(2, 2)] = 2;
+    board->data[BOARD(3, 2)] = 3;
+    board->data[BOARD(4, 2)] = 4;
+    board->data[BOARD(5, 2)] = 5;
+    board->data[BOARD(6, 2)] = 6;
+    board->data[BOARD(7, 2)] = 7;
+
+    LowrisAddTetromino(board, (lowris_tetrominoes)I, 0, 5);
+    LowrisAddTetromino(board, (lowris_tetrominoes)O, 0, 7);
+    LowrisAddTetromino(board, (lowris_tetrominoes)T, 0, 9);
+    LowrisAddTetromino(board, (lowris_tetrominoes)J, 0, 11);
+    LowrisAddTetromino(board, (lowris_tetrominoes)L, 0, 13);
+    LowrisAddTetromino(board, (lowris_tetrominoes)S, 0, 15);
+    LowrisAddTetromino(board, (lowris_tetrominoes)Z, 0, 17);
 
     while(state.running)
     {

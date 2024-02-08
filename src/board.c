@@ -45,7 +45,6 @@ void LowrisDrawBoard(lowris_board *board, SDL_Renderer *renderer, int32_t xpos, 
                     goto draw;
                 case 7:
                     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-                    goto draw;
                 draw:
                     SDL_RenderFillRect(renderer, &current);
                     break;
