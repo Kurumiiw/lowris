@@ -29,6 +29,14 @@ int main()
 
     lowris_board *board = LowrisCreateBoard();
 
+    board->data[1 + 2 * BOARD_WIDTH] = 1;
+    board->data[2 + 2 * BOARD_WIDTH] = 2;
+    board->data[3 + 2 * BOARD_WIDTH] = 3;
+    board->data[4 + 2 * BOARD_WIDTH] = 4;
+    board->data[5 + 2 * BOARD_WIDTH] = 5;
+    board->data[6 + 2 * BOARD_WIDTH] = 6;
+    board->data[7 + 2 * BOARD_WIDTH] = 7;
+
     while(state.running)
     {
         SDL_Event e;

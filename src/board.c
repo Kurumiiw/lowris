@@ -18,8 +18,40 @@ void LowrisDrawBoard(lowris_board *board, SDL_Renderer *renderer, int32_t xpos, 
     {
         for(int32_t x = 0; x < BOARD_WIDTH; x++)
         {
+            SDL_Rect current = { .h = TILE_SIZE, .w = TILE_SIZE, .x = xpos + x * TILE_SIZE, .y = ypos + y * TILE_SIZE};
+
             SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-            SDL_RenderDrawRect(renderer, &(SDL_Rect){ .h = TILE_SIZE, .w = TILE_SIZE, .x = xpos + x * TILE_SIZE, .y = ypos + y * TILE_SIZE});
+            SDL_RenderDrawRect(renderer, &current);
+
+            switch(board->data[x + BOARD_WIDTH * y])
+            {
+                case 1:
+                    SDL_SetRenderDrawColor(renderer, 123, 255, 255, 255);
+                    goto draw;
+                case 2:
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 123, 255);
+                    goto draw;
+                case 3:
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+                    goto draw;
+                case 4:
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                    goto draw;
+                case 5:
+                    SDL_SetRenderDrawColor(renderer, 255, 123, 0, 255);
+                    goto draw;
+                case 6:
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                    goto draw;
+                case 7:
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                    goto draw;
+                draw:
+                    SDL_RenderFillRect(renderer, &current);
+                    break;
+
+                default: break;
+            }
         }
     }
 }
