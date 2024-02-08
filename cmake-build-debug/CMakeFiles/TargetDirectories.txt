@@ -1,0 +1,3 @@
+/Users/kjeks/Documents/Programmering/lowris/cmake-build-debug/CMakeFiles/lowris.dir
+/Users/kjeks/Documents/Programmering/lowris/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kjeks/Documents/Programmering/lowris/cmake-build-debug/CMakeFiles/rebuild_cache.dir
