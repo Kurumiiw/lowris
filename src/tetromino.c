@@ -4,7 +4,7 @@
 
 #include "tetromino.h"
 
-void LowrisAddTetromino(lowris_board *board, lowris_tetrominoes type, int32_t xpos, int32_t ypos)
+void LowrisChangeBoard(bool add, lowris_board *board, lowris_tetrominoes type, int32_t xpos, int32_t ypos)
 {
     char* shape;
 
@@ -37,7 +37,16 @@ void LowrisAddTetromino(lowris_board *board, lowris_tetrominoes type, int32_t xp
     {
         for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
         {
-            board->data[BOARD(xpos + x, ypos + y)] = shape[TETR(x, y)];
+            board->data[BOARD(xpos + x, ypos + y)] = add? shape[TETR(x, y)] : 0;
         }
     }
+}
+
+void LowrisUpdateCurrentTetromino(lowris_board *board, lowris_current_tetromino *current, SDL_Renderer *renderer)
+{
+    LowrisChangeBoard(false, board, current->tetromino, current->last_x, current->last_y);
+    LowrisChangeBoard(true, board, current->tetromino, current->x, current->y);
+
+    current->last_x = current->x;
+    current->last_y = current->y;
 }
