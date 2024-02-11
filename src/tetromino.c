@@ -4,48 +4,208 @@
 
 #include "tetromino.h"
 
-void LowrisChangeBoard(bool add, lowris_board *board, lowris_tetrominoes type, int32_t xpos, int32_t ypos)
+void LowrisChangeBoard(bool add, lowris_board *board, lowris_current_tetromino *current, int32_t xpos, int32_t ypos)
 {
     char* shape;
 
-    switch(type)
+    switch(current->tetromino)
     {
         case I:
-            shape = (char[]){1, 1, 1, 1, 0, 0, 0, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){0,   0,  0,  0,
+                                     10, 10, 10, 10,
+                                     0,   0,  0, 0,
+                                     0,   0,  0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 0, 10, 0,
+                                     0, 0, 10, 0,
+                                     0, 0, 10, 0,
+                                     0, 0, 10, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     0, 0, 0, 0,
+                                     10, 10, 10, 10,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){0, 10, 0, 0,
+                                     0, 10, 0, 0,
+                                     0, 10, 0, 0,
+                                     0, 10, 0, 0};
+                    break;
+                default:break;
+            } break;
         case O:
-            shape = (char[]){2, 2, 0, 0, 2, 2, 0, 0};
+            shape = (char[]){20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             break;
         case T:
-            shape = (char[]){3, 3, 3, 0, 0, 3, 0, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){0, 30, 0, 0,
+                                     30, 30, 30, 0,
+                                     0, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 30, 0, 0,
+                                     0, 30, 30, 0,
+                                     0, 30, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     30, 30, 30, 0,
+                                     0, 30, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){0, 30, 0, 0,
+                                     30, 30, 0, 0,
+                                     0, 30, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                default:break;
+            } break;
         case J:
-            shape = (char[]){4, 4, 4, 0, 0, 0, 4, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){40, 0, 0, 0,
+                                     40, 40, 40, 0,
+                                     0, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 40, 40, 0,
+                                     0, 40, 0, 0,
+                                     0, 40, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     40, 40, 40, 0,
+                                     0, 0, 40, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){0, 40, 0, 0,
+                                     0, 40, 0, 0,
+                                     40, 40, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                default:break;
+            } break;
         case L:
-            shape = (char[]){0, 0, 5, 0, 5, 5, 5, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){0, 0, 50, 0,
+                                     50, 50, 50, 0,
+                                     0, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 50, 0, 0,
+                                     0, 50, 0, 0,
+                                     0, 50, 50, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     50, 50, 50, 0,
+                                     50, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){50, 50, 0, 0,
+                                     0, 50, 0, 0,
+                                     0, 50, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                default:break;
+            } break;
         case S:
-            shape = (char[]){0, 6, 6, 0, 6, 6, 0, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){0, 60, 60, 0,
+                                     60, 60, 0, 0,
+                                     0, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 60, 0, 0,
+                                     0, 60, 60, 0,
+                                     0, 0, 60, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     0, 60, 60, 0,
+                                     60, 60, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){60, 0, 0, 0,
+                                     60, 60, 0, 0,
+                                     0, 60, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                default:break;
+            } break;
         case Z:
-            shape = (char[]){7, 7, 0, 0, 0, 7, 7, 0};
-            break;
+            switch(current->rotation)
+            {
+                case 0:
+                    shape = (char[]){70, 70, 0, 0,
+                                     0, 70, 70, 0,
+                                     0, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 1:
+                    shape = (char[]){0, 0, 70, 0,
+                                     0, 70, 70, 0,
+                                     0, 70, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 2:
+                    shape = (char[]){0, 0, 0, 0,
+                                     70, 70, 0, 0,
+                                     0, 70, 70, 0,
+                                     0, 0, 0, 0};
+                    break;
+                case 3:
+                    shape = (char[]){0, 70, 0, 0,
+                                     70, 70, 0, 0,
+                                     70, 0, 0, 0,
+                                     0, 0, 0, 0};
+                    break;
+                default:break;
+            } break;
     }
 
     for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
     {
         for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
         {
-            board->data[BOARD(xpos + x, ypos + y)] = add? shape[TETR(x, y)] : 0;
+            if(add)
+            {
+                if(shape[TETR(x, y)] != 0) board->data[BOARD(xpos + x, ypos + y)] = shape[TETR(x, y)];
+            }
+            else if(board->data[BOARD(xpos + x, ypos + y)] > 9) board->data[BOARD(xpos + x, ypos + y)] = 0;
         }
     }
 }
 
 void LowrisUpdateCurrentTetromino(lowris_board *board, lowris_current_tetromino *current, SDL_Renderer *renderer)
 {
-    LowrisChangeBoard(false, board, current->tetromino, current->last_x, current->last_y);
-    LowrisChangeBoard(true, board, current->tetromino, current->x, current->y);
+    LowrisChangeBoard(false, board, current, current->last_x, current->last_y);
+    LowrisChangeBoard(true, board, current, current->x, current->y);
 
     current->last_x = current->x;
     current->last_y = current->y;

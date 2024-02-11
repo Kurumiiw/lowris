@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "board.h"
 #include "tetromino.h"
@@ -38,9 +39,31 @@ typedef struct {
     bool left_down;
 } lowris_state;
 
-void LowrisMoveCurrentPieceLeft(lowris_state *state)
+bool LowrisMoveCurrentPieceLeft(lowris_state *state, lowris_board *board)
 {
-    if(state->current_piece->x > 0) state->current_piece->x--;
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            if(state->current_piece->x + x < 0)
+                continue; //current tile is not a player tile, continue
+
+            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] > 9)
+            {
+                if(state->current_piece->x + x - 1 < 0)
+                    return false; // cannot move left, we are the leftmost possible
+
+
+                if(board->data[BOARD(state->current_piece->x + x - 1, state->current_piece->y + y)] < 9
+                && board->data[BOARD(state->current_piece->x + x - 1, state->current_piece->y + y)] > 0)
+                    return false; // cannot move left, something is blocking
+
+            }
+        }
+    }
+
+    state->current_piece->x--;
+    return true;
 }
 
 void LowrisMoveCurrentPieceRight(lowris_state *state)
@@ -49,9 +72,41 @@ void LowrisMoveCurrentPieceRight(lowris_state *state)
     if(state->current_piece->x < (BOARD_WIDTH - offset)) state->current_piece->x++;
 }
 
-void LowrisMoveCurrentPieceLeftmost(lowris_current_tetromino *current, lowris_board *board)
+bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
 {
-    current->x = 0;
+    int32_t x_min = -1;
+    int32_t true_x = INT32_MAX;
+
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            if(state->current_piece->x + x < 0)
+                continue; //current tile is not a player tile, continue
+
+            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] > 9)
+            {
+                true_x = x < true_x? x : true_x;
+
+                if(state->current_piece->x + x - 1 < 0)
+                    return false; // cannot move left, we are the leftmost possible
+
+                for(int32_t scan = state->current_piece->x + x; scan > -1; scan--)
+                {
+                    if(board->data[BOARD(scan, state->current_piece->y + y)] < 9
+                    && board->data[BOARD(scan, state->current_piece->y + y)] > 0)
+                        if(scan > x_min)
+                        {
+                            x_min = scan;
+                        }
+                }
+            }
+        }
+    }
+
+    printf("%i\n", x_min);
+    state->current_piece->x = x_min == -1? 0 - true_x : x_min + 1 - true_x;
+    return true;
 }
 
 void LowrisMoveCurrentPieceRightmost(lowris_current_tetromino *current, lowris_board *board)
@@ -59,6 +114,16 @@ void LowrisMoveCurrentPieceRightmost(lowris_current_tetromino *current, lowris_b
     int32_t offset = current->tetromino == I? 4 : 3;
 
     current->x = BOARD_WIDTH - offset;
+}
+
+void LowrisRotateCurrentPieceCCW(lowris_current_tetromino *current, lowris_board *board)
+{
+    current->rotation = current->rotation == 0? 3 : current->rotation - 1;
+}
+
+void LowrisRotateCurrentPieceCW(lowris_current_tetromino *current, lowris_board *board)
+{
+    current->rotation = current->rotation == 3? 0 : current->rotation + 1;
 }
 
 int main()
@@ -89,7 +154,8 @@ int main()
     state.current_piece = &(lowris_current_tetromino){
         .tetromino = I,
         .x = 3, .last_x = 3,
-        .y = 0, .last_y = 0
+        .y = 2, .last_y = 2,
+        .rotation = 0, .last_rot = 0
     };
 
     state.repeat_timer = 0;
@@ -99,6 +165,10 @@ int main()
     state.repeat_wait_threshold = 87;
 
     state.move_timer = 0;
+
+    board->data[BOARD(0, 4)] = 3;
+    board->data[BOARD(1, 4)] = 3;
+
 
     while(state.running)
     {
@@ -113,7 +183,7 @@ int main()
         {
             if(e.type == SDL_QUIT) state.running = false;
 
-            if(e.type == SDL_KEYDOWN)
+            if(e.type == SDL_KEYDOWN && e.key.repeat == 0)
             {
                 switch ((lowris_keymap)e.key.keysym.sym)
                 {
@@ -124,8 +194,12 @@ int main()
                         state.right_down = true;
                         break;
                     case LOWRIS_SLOW:break;
-                    case LOWRIS_ROT_CW:break;
-                    case LOWRIS_ROT_CCW:break;
+                    case LOWRIS_ROT_CW:
+                        LowrisRotateCurrentPieceCW(state.current_piece, board);
+                        break;
+                    case LOWRIS_ROT_CCW:
+                        LowrisRotateCurrentPieceCCW(state.current_piece, board);
+                        break;
                     case LOWRIS_HARD:break;
                     case LOWRIS_HOLD:break;
                     case LOWRIS_ROT_180:break;
@@ -172,7 +246,7 @@ int main()
             state.repeat_wait_timer = 0;
             state.repeat_timer = 0;
 
-            LowrisMoveCurrentPieceLeft(&state);
+            LowrisMoveCurrentPieceLeft(&state, board);
             state.last_direction = LOWRIS_LEFT;
         }
 
@@ -195,7 +269,7 @@ int main()
             if(state.repeat_wait_timer > state.repeat_wait_threshold)
             {
                 //CHECK speed setting
-                LowrisMoveCurrentPieceLeftmost(state.current_piece, board);
+                LowrisMoveCurrentPieceLeftmost(&state, board);
             }
         }
         // oth are not being pressed, right is held down

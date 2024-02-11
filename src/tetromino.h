@@ -9,7 +9,7 @@
 #include "board.h"
 
 #define TETROMINO_WIDTH 4
-#define TETROMINO_HEIGHT 2
+#define TETROMINO_HEIGHT 4
 
 #define TETR(x, y) ((x) + (y) * TETROMINO_WIDTH)
 
@@ -26,10 +26,12 @@ typedef enum {
 typedef struct {
     int32_t x, last_x;
     int32_t y, last_y;
+
+    int32_t rotation, last_rot;
     lowris_tetrominoes tetromino;
 } lowris_current_tetromino;
 
-void LowrisChangeBoard(bool add, lowris_board *board, lowris_tetrominoes type, int32_t xpos, int32_t ypos);
+void LowrisChangeBoard(bool add, lowris_board *board, lowris_current_tetromino *current, int32_t xpos, int32_t ypos);
 void LowrisUpdateCurrentTetromino(lowris_board *board, lowris_current_tetromino *current, SDL_Renderer *renderer);
 
 #endif //LOWRIS_TETROMINO_H
