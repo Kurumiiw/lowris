@@ -58,8 +58,9 @@ bool LowrisMoveCurrentPieceRight(lowris_state *state, lowris_board *board)
 
 bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
 {
-    int32_t x_min = -1;
+    int32_t hit  = -1;
     int32_t true_x = INT32_MAX;
+    int32_t hit_x  = INT32_MAX;
 
     for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
     {
@@ -70,8 +71,7 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
 
             if(board->data[BOARD(current_x, current_y)] < 10)
                 continue; //not a player tile, continue
-
-            if(board->data[BOARD(current_x, current_y)] > 9)
+            else
             {
                 true_x = x < true_x? x : true_x;
 
@@ -81,23 +81,25 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
                 for(int32_t scan = current_x; scan > -1; scan--)
                 {
                     if(board->data[BOARD(scan, current_y)] < 9
-                       && board->data[BOARD(scan, current_y)] > 0)
-                        if(scan > x_min)
+                    && board->data[BOARD(scan, current_y)] > 0)
+                        if(scan >= hit)
                         {
-                            x_min = scan;
+                            hit = scan;
+                            hit_x = x < hit_x? x : hit_x;
                         }
                 }
             }
         }
     }
 
-    state->current_piece->x = x_min == -1? 0 - true_x : x_min + 1 - true_x;
+    state->current_piece->x = hit == -1 ? 0 - true_x : hit + 1 - hit_x;
     return true;
 }
 
 bool LowrisMoveCurrentPieceRightmost(lowris_state *state, lowris_board *board)
 {
-    int32_t hit = INT32_MAX;
+    int32_t hit    = INT32_MAX;
+    int32_t hit_x  = 0;
     int32_t true_x = 0;
 
     for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
@@ -111,7 +113,6 @@ bool LowrisMoveCurrentPieceRightmost(lowris_state *state, lowris_board *board)
                 continue; //not a player tile, continue
             else
             {
-                //offset within 4x4 piece
                 true_x = x > true_x? x : true_x;
 
                 if(current_x + 1 >= BOARD_WIDTH)
@@ -120,16 +121,17 @@ bool LowrisMoveCurrentPieceRightmost(lowris_state *state, lowris_board *board)
                 for(int32_t scan = current_x; scan < BOARD_WIDTH; scan++)
                 {
                     if(board->data[BOARD(scan, current_y)] < 9
-                       && board->data[BOARD(scan, current_y)] > 0)
-                        if(scan < hit)
+                    && board->data[BOARD(scan, current_y)] > 0)
+                        if(scan <= hit)
                         {
                             hit = scan;
+                            hit_x = x > hit_x? x : hit_x;
                         }
                 }
             }
         }
     }
 
-    state->current_piece->x = hit == INT32_MAX? BOARD_WIDTH - 1 - true_x : hit - 1 - true_x;
+    state->current_piece->x = hit == INT32_MAX? BOARD_WIDTH - 1 - true_x : hit - 1 - hit_x;
     return true;
 }

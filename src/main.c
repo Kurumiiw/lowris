@@ -44,7 +44,7 @@ int main()
     // Current piece setup
 
     state.current_piece = &(lowris_current_tetromino){
-        .tetromino = I,
+        .tetromino = T,
         .x = 3, .last_x = 3,
         .y = 2, .last_y = 2,
         .rotation = 0, .last_rot = 0
