@@ -1,174 +1,12 @@
 #include <SDL.h>
 #include <stdbool.h>
-#include <math.h>
+
+#include "structs.h"
+#include "controls.h"
 
 #include "board.h"
 #include "tetromino.h"
 #include "ns.h"
-
-typedef enum {
-    LOWRIS_NONE     = 0,
-    LOWRIS_LEFT     = SDLK_LEFT,
-    LOWRIS_RIGHT    = SDLK_RIGHT,
-    LOWRIS_SLOW     = SDLK_DOWN,
-    LOWRIS_HARD     = SDLK_SPACE,
-    LOWRIS_HOLD     = SDLK_LSHIFT,
-    LOWRIS_ROT_CW   = SDLK_UP,
-    LOWRIS_ROT_CCW  = SDLK_RSHIFT,
-    LOWRIS_ROT_180  = SDLK_z
-} lowris_keymap;
-
-typedef struct {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    bool running;
-
-    lowris_current_tetromino *current_piece;
-
-    double move_timer;
-
-    double repeat_timer;
-    double repeat_timer_threshold;
-
-    double repeat_wait_timer;
-    double repeat_wait_threshold;
-
-    lowris_keymap last_direction;
-
-    bool right_down;
-    bool left_down;
-} lowris_state;
-
-bool LowrisMoveCurrentPieceLeft(lowris_state *state, lowris_board *board)
-{
-    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
-    {
-        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
-        {
-            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] < 10)
-                continue; //current tile is not a player tile, continue
-
-            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] > 9)
-            {
-                if(state->current_piece->x + x - 1 < 0)
-                    return false; // cannot move left, we are the leftmost possible
-
-
-                if(board->data[BOARD(state->current_piece->x + x - 1, state->current_piece->y + y)] < 9
-                && board->data[BOARD(state->current_piece->x + x - 1, state->current_piece->y + y)] > 0)
-                    return false; // cannot move left, something is blocking
-
-            }
-        }
-    }
-
-    state->current_piece->x--;
-    return true;
-}
-
-bool LowrisMoveCurrentPieceRight(lowris_state *state, lowris_board *board)
-{
-    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
-    {
-        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
-        {
-            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] < 10)
-                continue; //current tile is not a player tile, continue
-            else
-            {
-                if(state->current_piece->x + x + 1 >= BOARD_WIDTH)
-                    return false; // cannot move right, we are the rightmost possible
-
-                if(board->data[BOARD(state->current_piece->x + x + 1, state->current_piece->y + y)] < 9
-                   && board->data[BOARD(state->current_piece->x + x + 1, state->current_piece->y + y)] > 0)
-                    return false; // cannot move right, something is blocking
-
-            }
-        }
-    }
-
-    state->current_piece->x++;
-    return true;
-}
-
-bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
-{
-    int32_t x_min = -1;
-    int32_t true_x = INT32_MAX;
-
-    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
-    {
-        for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
-        {
-            int32_t current_x = state->current_piece->x + x;
-            int32_t current_y = state->current_piece->y + y;
-
-            if(board->data[BOARD(current_x, current_y)] < 10)
-                continue; //not a player tile, continue
-
-            if(board->data[BOARD(current_x, current_y)] > 9)
-            {
-                true_x = x < true_x? x : true_x;
-
-                if(current_x - 1 < 0)
-                    return false; // cannot move left, we are the leftmost possible
-
-                for(int32_t scan = current_x; scan > -1; scan--)
-                {
-                    if(board->data[BOARD(scan, current_y)] < 9
-                    && board->data[BOARD(scan, current_y)] > 0)
-                        if(scan > x_min)
-                        {
-                            x_min = scan;
-                        }
-                }
-            }
-        }
-    }
-
-    state->current_piece->x = x_min == -1? 0 - true_x : x_min + 1 - true_x;
-    return true;
-}
-
-bool LowrisMoveCurrentPieceRightmost(lowris_state *state, lowris_board *board)
-{
-    int32_t hit = INT32_MAX;
-    int32_t true_x = 0;
-
-    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
-    {
-        for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
-        {
-            int32_t current_x = state->current_piece->x + x;
-            int32_t current_y = state->current_piece->y + y;
-
-            if(board->data[BOARD(current_x, current_y)] < 10)
-                continue; //not a player tile, continue
-            else
-            {
-                //offset within 4x4 piece
-                true_x = x > true_x? x : true_x;
-
-                if(current_x + 1 >= BOARD_WIDTH)
-                    return false; // cannot move right, we are the rightmost possible
-
-                for(int32_t scan = current_x; scan < BOARD_WIDTH; scan++)
-                {
-                    if(board->data[BOARD(scan, current_y)] < 9
-                    && board->data[BOARD(scan, current_y)] > 0)
-                        if(scan < hit)
-                        {
-                            hit = scan;
-                        }
-                }
-            }
-        }
-    }
-
-    printf("hit: %i\ntrue_x: %i\n", hit, true_x);
-    state->current_piece->x = hit == INT32_MAX? BOARD_WIDTH - 1 - true_x : hit - 1 - true_x;
-    return true;
-}
 
 void LowrisRotateCurrentPieceCCW(lowris_current_tetromino *current, lowris_board *board)
 {
@@ -199,7 +37,7 @@ int main()
             0
             );
 
-    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_ACCELERATED);
 
     lowris_board *board = LowrisCreateBoard();
 
@@ -314,6 +152,13 @@ int main()
                     goto LEFT_MOVEMENT_LOGIC;
                 case LOWRIS_RIGHT:
                     goto RIGHT_MOVEMENT_LOGIC;
+                case LOWRIS_NONE:break;
+                case LOWRIS_SLOW:break;
+                case LOWRIS_HARD:break;
+                case LOWRIS_HOLD:break;
+                case LOWRIS_ROT_CW:break;
+                case LOWRIS_ROT_CCW:break;
+                case LOWRIS_ROT_180:break;
             }
         }
         //both are not being pressed, left is held down
