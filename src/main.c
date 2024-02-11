@@ -45,7 +45,7 @@ bool LowrisMoveCurrentPieceLeft(lowris_state *state, lowris_board *board)
     {
         for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
         {
-            if(state->current_piece->x + x < 0)
+            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] < 10)
                 continue; //current tile is not a player tile, continue
 
             if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] > 9)
@@ -66,10 +66,29 @@ bool LowrisMoveCurrentPieceLeft(lowris_state *state, lowris_board *board)
     return true;
 }
 
-void LowrisMoveCurrentPieceRight(lowris_state *state)
+bool LowrisMoveCurrentPieceRight(lowris_state *state, lowris_board *board)
 {
-    int32_t offset = state->current_piece->tetromino == I? 4 : 3;
-    if(state->current_piece->x < (BOARD_WIDTH - offset)) state->current_piece->x++;
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] < 10)
+                continue; //current tile is not a player tile, continue
+            else
+            {
+                if(state->current_piece->x + x + 1 >= BOARD_WIDTH)
+                    return false; // cannot move right, we are the rightmost possible
+
+                if(board->data[BOARD(state->current_piece->x + x + 1, state->current_piece->y + y)] < 9
+                   && board->data[BOARD(state->current_piece->x + x + 1, state->current_piece->y + y)] > 0)
+                    return false; // cannot move right, something is blocking
+
+            }
+        }
+    }
+
+    state->current_piece->x++;
+    return true;
 }
 
 bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
@@ -81,20 +100,23 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
     {
         for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
         {
-            if(state->current_piece->x + x < 0)
-                continue; //current tile is not a player tile, continue
+            int32_t current_x = state->current_piece->x + x;
+            int32_t current_y = state->current_piece->y + y;
 
-            if(board->data[BOARD(state->current_piece->x + x, state->current_piece->y + y)] > 9)
+            if(board->data[BOARD(current_x, current_y)] < 10)
+                continue; //not a player tile, continue
+
+            if(board->data[BOARD(current_x, current_y)] > 9)
             {
                 true_x = x < true_x? x : true_x;
 
-                if(state->current_piece->x + x - 1 < 0)
+                if(current_x - 1 < 0)
                     return false; // cannot move left, we are the leftmost possible
 
-                for(int32_t scan = state->current_piece->x + x; scan > -1; scan--)
+                for(int32_t scan = current_x; scan > -1; scan--)
                 {
-                    if(board->data[BOARD(scan, state->current_piece->y + y)] < 9
-                    && board->data[BOARD(scan, state->current_piece->y + y)] > 0)
+                    if(board->data[BOARD(scan, current_y)] < 9
+                    && board->data[BOARD(scan, current_y)] > 0)
                         if(scan > x_min)
                         {
                             x_min = scan;
@@ -104,16 +126,48 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
         }
     }
 
-    printf("%i\n", x_min);
     state->current_piece->x = x_min == -1? 0 - true_x : x_min + 1 - true_x;
     return true;
 }
 
-void LowrisMoveCurrentPieceRightmost(lowris_current_tetromino *current, lowris_board *board)
+bool LowrisMoveCurrentPieceRightmost(lowris_state *state, lowris_board *board)
 {
-    int32_t offset = current->tetromino == I? 4 : 3;
+    int32_t hit = INT32_MAX;
+    int32_t true_x = 0;
 
-    current->x = BOARD_WIDTH - offset;
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            int32_t current_x = state->current_piece->x + x;
+            int32_t current_y = state->current_piece->y + y;
+
+            if(board->data[BOARD(current_x, current_y)] < 10)
+                continue; //not a player tile, continue
+            else
+            {
+                //offset within 4x4 piece
+                true_x = x > true_x? x : true_x;
+
+                if(current_x + 1 >= BOARD_WIDTH)
+                    return false; // cannot move right, we are the rightmost possible
+
+                for(int32_t scan = current_x; scan < BOARD_WIDTH; scan++)
+                {
+                    if(board->data[BOARD(scan, current_y)] < 9
+                    && board->data[BOARD(scan, current_y)] > 0)
+                        if(scan < hit)
+                        {
+                            hit = scan;
+                        }
+                }
+            }
+        }
+    }
+
+    printf("hit: %i\ntrue_x: %i\n", hit, true_x);
+    state->current_piece->x = hit == INT32_MAX? BOARD_WIDTH - 1 - true_x : hit - 1 - true_x;
+    return true;
 }
 
 void LowrisRotateCurrentPieceCCW(lowris_current_tetromino *current, lowris_board *board)
@@ -168,6 +222,7 @@ int main()
 
     board->data[BOARD(0, 4)] = 3;
     board->data[BOARD(1, 4)] = 3;
+    board->data[BOARD(9, 3)] = 5;
 
 
     while(state.running)
@@ -236,7 +291,7 @@ int main()
             state.repeat_wait_timer = 0;
             state.repeat_timer = 0;
 
-            LowrisMoveCurrentPieceRight(&state);
+            LowrisMoveCurrentPieceRight(&state, board);
             state.last_direction = LOWRIS_RIGHT;
         }
 
@@ -280,7 +335,7 @@ int main()
             if(state.repeat_wait_timer > state.repeat_wait_threshold)
             {
                 //CHECK speed setting
-                LowrisMoveCurrentPieceRightmost(state.current_piece, board);
+                LowrisMoveCurrentPieceRightmost(&state, board);
             }
         }
 
