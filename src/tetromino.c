@@ -3,6 +3,58 @@
 //
 
 #include "tetromino.h"
+#include "structs.h"
+
+void LowrisCheckPlaceTetromino(lowris_state *state, lowris_board *board)
+{
+    int32_t max_y = -1;
+    lowris_current_tetromino *current = state->current_piece;
+
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            if(current->y + y > BOARD_HEIGHT)
+                max_y = current->y;
+
+
+            if(board->data[BOARD(current->x + x, current->y + y)] > 9)
+            {
+                if(board->data[BOARD(current->x + x, current->y + y + 1)] < 10
+                && board->data[BOARD(current->x + x, current->y + y + 1)] > 0)
+                {
+                    if(current->y + y >= max_y)
+                        max_y = current->y + y;
+
+                }
+            }
+        }
+    }
+
+    if(max_y != -1)
+    {
+        for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+        {
+            for (int32_t x = 0; x < TETROMINO_WIDTH; x++)
+            {
+                if(board->data[BOARD(current->x + x, current->y + y)] > 9)
+                {
+                    board->data[BOARD(current->x + x, current->y + y)] /= 10; //???
+                }
+            }
+        }
+
+        free(state->current_piece);
+        state->current_piece = malloc(sizeof(lowris_current_tetromino));
+        state->current_piece->tetromino = Z;
+        state->current_piece->x = 3;
+        state->current_piece->last_x = 3;
+        state->current_piece->y = 2;
+        state->current_piece->last_y = 2;
+        state->current_piece->rotation = 0;
+        state->current_piece->last_rot = 0;
+    }
+}
 
 char* LowrisTetrominoShape(lowris_current_tetromino *current)
 {

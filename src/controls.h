@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "board.h"
 #include "structs.h"
+#include "tetromino.h"
 
 bool LowrisMoveCurrentPieceLeft(lowris_state *state, lowris_board *board);
 bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board);

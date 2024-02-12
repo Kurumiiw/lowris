@@ -6,7 +6,18 @@
 #define LOWRIS_STRUCTS_H
 
 #include <SDL.h>
-#include "tetromino.h"
+
+typedef enum {
+    I, O, T, J, L, S, Z
+} lowris_tetrominoes;
+
+typedef struct {
+    int32_t x, last_x;
+    int32_t y, last_y;
+
+    int32_t rotation, last_rot;
+    lowris_tetrominoes tetromino;
+} lowris_current_tetromino;
 
 typedef enum {
     LOWRIS_NONE     = 0,

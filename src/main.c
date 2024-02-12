@@ -43,12 +43,14 @@ int main()
 
     // Current piece setup
 
-    state.current_piece = &(lowris_current_tetromino){
-        .tetromino = Z,
-        .x = 3, .last_x = 3,
-        .y = 2, .last_y = 2,
-        .rotation = 0, .last_rot = 0
-    };
+    state.current_piece = malloc(sizeof(lowris_current_tetromino));
+    state.current_piece->tetromino = T;
+    state.current_piece->x = 3;
+    state.current_piece->last_x = 3;
+    state.current_piece->y = 2;
+    state.current_piece->last_y = 2;
+    state.current_piece->rotation = 0;
+    state.current_piece->last_rot = 0;
 
     state.repeat_timer = 0;
     state.repeat_timer_threshold = 0;
@@ -188,12 +190,13 @@ int main()
 
         if(state.move_timer >= 500) //todo: update based on level
         {
-            //state.current_piece->y += 1;
+            state.current_piece->y += 1;
 
             state.move_timer = 0;
         }
 
         LowrisUpdateCurrentTetromino(board, state.current_piece, state.renderer);
+        LowrisCheckPlaceTetromino(&state, board);
 
         left_down_last = state.left_down;
         right_down_last = state.right_down;
