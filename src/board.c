@@ -8,7 +8,7 @@ lowris_board* LowrisCreateBoard()
 {
     lowris_board *result = malloc(sizeof(lowris_board));
 
-    result->data = calloc(10 * 20, 1);
+    result->data = calloc(BOARD_HEIGHT * BOARD_WIDTH, 1);
     return result;
 }
 

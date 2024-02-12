@@ -177,6 +177,26 @@ char* LowrisTetrominoShape(lowris_current_tetromino *current)
     return NULL;
 }
 
+bool LowrisSRSTest(lowris_current_tetromino *current, lowris_kicktable_entry entry, lowris_board *board)
+{
+    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    {
+        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
+        {
+            char* shape = LowrisTetrominoShape(current);
+
+            if(current->x + x + entry.x < 0 || current->x + x + entry.x >= BOARD_WIDTH)
+                return false;
+
+            if(shape[TETR(x, y)] != 0
+            && board->data[BOARD(current->x + x + entry.x, current->y + y + entry.y)] != 0)
+                return false;
+        }
+    }
+
+    return true;
+}
+
 // The new rotation state MUST be set in the lowris_current_tetromino as the "rotation" member.
 void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *board, bool add, int32_t xpos, int32_t ypos)
 {
@@ -195,28 +215,85 @@ void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *boar
     }
 
     // See if there is nothing obstructing the rotation
-    bool needs_kicktable = false;
+    bool needs_kicktable = true;
 
-    for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+    /*for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
     {
         if(needs_kicktable)
             break;
 
         for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
         {
-            if(board->data[BOARD(xpos + x, ypos + y)] < 10
+            if((board->data[BOARD(xpos + x, ypos + y)] < 10
             && board->data[BOARD(xpos + x, ypos + y)] > 0 )
+            || xpos < 1
+            || xpos > BOARD_WIDTH - 2)
             {
                 needs_kicktable = true;
                 break;
             }
         }
-    }
+    }*/
 
     char* shape = LowrisTetrominoShape(current);
 
-    if(needs_kicktable && current->rotation != current->last_rot)
+    if(current->rotation != current->last_rot)
     {
+        //rotation requires kicktable, we just rotated
+        int32_t row = -1;
+        if(current->last_rot == 0)
+        {
+            if(current->rotation == 1)  row = 0;
+            else                        row = 7;
+        }
+        else if(current->last_rot == 1)
+        {
+            if (current->rotation == 0) row = 1;
+            else                        row = 2;
+        }
+        else if(current->last_rot == 2)
+        {
+            if(current->rotation == 1)  row = 3;
+            else                        row = 4;
+        }
+        else if(current->last_rot == 3)
+        {
+            if(current->rotation == 2)  row = 5;
+            else                        row = 6;
+        }
+
+        for(int32_t column = 0; column < 6; column++)
+        {
+            int32_t index = row * 5 + column;
+
+            lowris_kicktable_entry entry = srs_ljstz_table[index];
+
+            bool test = LowrisSRSTest(current, entry, board);
+            if(test)
+            {
+                printf("SRS test %i succeeded\n", column);
+
+                for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
+                {
+                    for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
+                    {
+                        if(shape[TETR(x, y)] != 0) board->data[BOARD(xpos + x + entry.x, ypos + y + entry.y)] = shape[TETR(x, y)];
+                    }
+                }
+
+                current->x += entry.x;
+                current->y += entry.y;
+
+                return;
+            }
+            else
+            {
+                printf("SRS test %i failed\n", column);
+            }
+        }
+
+        // abort rotation, no available rotations
+        current->rotation = current->last_rot;
         return;
     }
 
