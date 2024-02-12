@@ -75,8 +75,9 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
             {
                 true_x = x < true_x? x : true_x;
 
-                if(current_x - 1 < 0)
+                if(current_x == 0)
                     return false; // cannot move left, we are the leftmost possible
+
 
                 for(int32_t scan = current_x; scan > -1; scan--)
                 {
@@ -93,6 +94,7 @@ bool LowrisMoveCurrentPieceLeftmost(lowris_state *state, lowris_board *board)
     }
 
     state->current_piece->x = hit == -1 ? 0 - true_x : hit + 1 - hit_x;
+
     return true;
 }
 
