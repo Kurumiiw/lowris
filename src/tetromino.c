@@ -266,9 +266,6 @@ void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *boar
         return;
     }
 
-    // See if there is nothing obstructing the rotation
-    bool needs_kicktable = true;
-
     /*for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
     {
         if(needs_kicktable)
@@ -318,7 +315,7 @@ void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *boar
         {
             int32_t index = row * 5 + column;
 
-            lowris_kicktable_entry entry = srs_ljstz_table[index];
+            lowris_kicktable_entry entry = current->tetromino == I? srs_i_table[index] : srs_ljstz_table[index];
 
             bool test = LowrisSRSTest(current, entry, board);
             if(test)

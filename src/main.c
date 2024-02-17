@@ -196,7 +196,7 @@ int main()
         }
 
         LowrisUpdateCurrentTetromino(board, state.current_piece, state.renderer);
-        LowrisCheckPlaceTetromino(&state, board);
+        //LowrisCheckPlaceTetromino(&state, board);
 
         left_down_last = state.left_down;
         right_down_last = state.right_down;
