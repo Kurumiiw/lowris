@@ -8,7 +8,13 @@
 #include <SDL.h>
 
 typedef enum {
-    I, O, T, J, L, S, Z
+    I =  0,
+    O = -1,
+    T =  1,
+    J =  2,
+    L =  3,
+    S =  4,
+    Z =  5
 } lowris_tetrominoes;
 
 typedef struct {

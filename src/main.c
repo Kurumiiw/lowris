@@ -44,7 +44,7 @@ int main()
     // Current piece setup
 
     state.current_piece = malloc(sizeof(lowris_current_tetromino));
-    state.current_piece->tetromino = T;
+    state.current_piece->tetromino = O;
     state.current_piece->x = 3;
     state.current_piece->last_x = 3;
     state.current_piece->y = 2;

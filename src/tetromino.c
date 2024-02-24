@@ -58,145 +58,17 @@ void LowrisCheckPlaceTetromino(lowris_state *state, lowris_board *board)
 
 char* LowrisTetrominoShape(lowris_current_tetromino *current)
 {
-    switch (current->tetromino)
+    if(current->tetromino == O) return (char[]) {20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation + (TETROMINO_HEIGHT * TETROMINO_WIDTH * 4 * current->tetromino)];
+
+    /*switch (current->tetromino)
     {
-        case I:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {0, 0, 0, 0,
-                                     10, 10, 10, 10,
-                                     0, 0, 0, 0,
-                                     0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 0, 10, 0,
-                                     0, 0, 10, 0,
-                                     0, 0, 10, 0,
-                                     0, 0, 10, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      0, 0, 0, 0,
-                                      10, 10, 10, 10,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {0, 10, 0, 0,
-                                      0, 10, 0, 0,
-                                      0, 10, 0, 0,
-                                      0, 10, 0, 0};
-                default:
-                    break;
-            }
-            break;
-        case O:
-            return (char[]) {20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        case T:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {0, 30, 0, 0,
-                                      30, 30, 30, 0,
-                                      0, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 30, 0, 0,
-                                      0, 30, 30, 0,
-                                      0, 30, 0, 0,
-                                      0, 0, 0, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      30, 30, 30, 0,
-                                      0, 30, 0, 0,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {0, 30, 0, 0,
-                                      30, 30, 0, 0,
-                                      0, 30, 0, 0,
-                                      0, 0, 0, 0};
-                default:
-                    break;
-            }
-            break;
-        case J:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {40, 0, 0, 0,
-                                      40, 40, 40, 0,
-                                      0, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 40, 40, 0,
-                                      0, 40, 0, 0,
-                                      0, 40, 0, 0,
-                                      0, 0, 0, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      40, 40, 40, 0,
-                                      0, 0, 40, 0,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {0, 40, 0, 0,
-                                      0, 40, 0, 0,
-                                      40, 40, 0, 0,
-                                      0, 0, 0, 0};
-                default:
-                    break;
-            }
-            break;
-        case L:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {0, 0, 50, 0,
-                                      50, 50, 50, 0,
-                                      0, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 50, 0, 0,
-                                      0, 50, 0, 0,
-                                      0, 50, 50, 0,
-                                      0, 0, 0, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      50, 50, 50, 0,
-                                      50, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {50, 50, 0, 0,
-                                      0, 50, 0, 0,
-                                      0, 50, 0, 0,
-                                      0, 0, 0, 0};
-                default:
-                    break;
-            }
-            break;
-        case S:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {0, 60, 60, 0,
-                                      60, 60, 0, 0,
-                                      0, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 60, 0, 0,
-                                      0, 60, 60, 0,
-                                      0, 0, 60, 0,
-                                      0, 0, 0, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      0, 60, 60, 0,
-                                      60, 60, 0, 0,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {60, 0, 0, 0,
-                                      60, 60, 0, 0,
-                                      0, 60, 0, 0,
-                                      0, 0, 0, 0};
-                default:
-                    break;
-            }
-            break;
+        case I: return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation];
+        case O: return (char[]) {20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        case T: return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation];
+
+
         case Z:
             switch (current->rotation)
             {
@@ -224,7 +96,7 @@ char* LowrisTetrominoShape(lowris_current_tetromino *current)
                     break;
             }
             break;
-    }
+    }*/
 
     return NULL;
 }
@@ -266,25 +138,8 @@ void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *boar
         return;
     }
 
-    /*for(int32_t y = 0; y < TETROMINO_HEIGHT; y++)
-    {
-        if(needs_kicktable)
-            break;
-
-        for(int32_t x = 0; x < TETROMINO_WIDTH; x++)
-        {
-            if((board->data[BOARD(xpos + x, ypos + y)] < 10
-            && board->data[BOARD(xpos + x, ypos + y)] > 0 )
-            || xpos < 1
-            || xpos > BOARD_WIDTH - 2)
-            {
-                needs_kicktable = true;
-                break;
-            }
-        }
-    }*/
-
     char* shape = LowrisTetrominoShape(current);
+
 
     if(current->rotation != current->last_rot)
     {
@@ -318,6 +173,7 @@ void LowrisRotateTetromino(lowris_current_tetromino *current, lowris_board *boar
             lowris_kicktable_entry entry = current->tetromino == I? srs_i_table[index] : srs_ljstz_table[index];
 
             bool test = LowrisSRSTest(current, entry, board);
+
             if(test)
             {
                 printf("SRS test %i succeeded\n", column);
