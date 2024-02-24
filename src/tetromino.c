@@ -61,44 +61,6 @@ char* LowrisTetrominoShape(lowris_current_tetromino *current)
     if(current->tetromino == O) return (char[]) {20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation + (TETROMINO_HEIGHT * TETROMINO_WIDTH * 4 * current->tetromino)];
-
-    /*switch (current->tetromino)
-    {
-        case I: return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation];
-        case O: return (char[]) {20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        case T: return (char*) &shapes[TETROMINO_WIDTH * TETROMINO_HEIGHT * current->rotation];
-
-
-        case Z:
-            switch (current->rotation)
-            {
-                case 0:
-                    return (char[]) {70, 70, 0, 0,
-                                      0, 70, 70, 0,
-                                      0, 0, 0, 0,
-                                      0, 0, 0, 0};
-                case 1:
-                    return (char[]) {0, 0, 70, 0,
-                                      0, 70, 70, 0,
-                                      0, 70, 0, 0,
-                                      0, 0, 0, 0};
-                case 2:
-                    return (char[]) {0, 0, 0, 0,
-                                      70, 70, 0, 0,
-                                      0, 70, 70, 0,
-                                      0, 0, 0, 0};
-                case 3:
-                    return (char[]) {0, 70, 0, 0,
-                                      70, 70, 0, 0,
-                                      70, 0, 0, 0,
-                                      0, 0, 0, 0};
-                default:
-                    break;
-            }
-            break;
-    }*/
-
-    return NULL;
 }
 
 bool LowrisSRSTest(lowris_current_tetromino *current, lowris_kicktable_entry entry, lowris_board *board)
@@ -109,12 +71,14 @@ bool LowrisSRSTest(lowris_current_tetromino *current, lowris_kicktable_entry ent
         {
             char* shape = LowrisTetrominoShape(current);
 
-            if(current->x + x + entry.x < 0 || current->x + x + entry.x >= BOARD_WIDTH)
-                return false;
+            if(shape[TETR(x, y)] != 0)
+            {
+                if(current->x + x + entry.x < 0 || current->x + x + entry.x >= BOARD_WIDTH)
+                    return false;
 
-            if(shape[TETR(x, y)] != 0
-            && board->data[BOARD(current->x + x + entry.x, current->y + y + entry.y)] != 0)
-                return false;
+                if(board->data[BOARD(current->x + x + entry.x, current->y + y + entry.y)] != 0)
+                    return false;
+            }
         }
     }
 
